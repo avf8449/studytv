@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF--8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lofi Study TV</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -18,145 +18,46 @@
             font-family: 'VT323', monospace;
         }
         
+        /* ENHANCED Retro TV Styling */
         .tv-container {
-    background: #2d3748; /* gray-800 */
-    border-radius: 2rem;
-    padding: 1.25rem;
-    border: 4px solid #1a202c; /* gray-900 */
-    box-shadow: 8px 8px 20px rgba(0,0,0,0.6), inset 4px 4px 10px rgba(0,0,0,0.4);
-    position: relative;
-    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-}
-.tv-screen {
-    position: relative;
-    overflow: hidden;
-    border-radius: 1.5rem; /* Tighter radius for a more CRT-like screen */
-    background: #000;
-    border: 2px solid #4a5568; /* gray-700 */
-    transition: border-color 0.3s ease;
-    /* This creates the curved screen effect */
-    transform: perspective(350px) rotateX(2deg);
-    box-shadow: inset 0 0 50px 15px rgba(0,0,0,0.6); /* Inner shadow for depth */
-
-    /* ADDED: Subtle static/noise effect on the screen */
-    animation: tv-noise 8s infinite step-end;
-}
-/* Scanline effect for retro feel */
-.tv-screen::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: repeating-linear-gradient(
-        0deg,
-        rgba(255, 255, 255, 0.04),
-        rgba(255, 255, 255, 0.04) 1px,
-        transparent 1px,
-        transparent 3px
-    );
-    pointer-events: none;
-    z-index: 3; /* Ensure scanlines are on top */
-    /* ADDED: More noticeable scanline effect, and a subtle color tint */
-    opacity: 0.7; /* Make scanlines more visible */
-    background-color: rgba(0, 255, 0, 0.05); /* Very subtle green tint for old monitors */
-}
-#player-container {
-     width: 100%;
-     padding-top: 56.25%; /* 16:9 Aspect Ratio */
-     position: relative;
-}
-#player {
-    position: absolute;
-    top: -2.5%;
-    left: -5%;
-    width: 105%; /* Slightly larger to fill curved corners */
-    height: 105%;
-    border: none;
-    /* ENHANCED: Added more filter effects for a distressed, older look */
-    filter: sepia(0.3) contrast(1.1) brightness(0.9) saturate(1.2) hue-rotate(-5deg) blur(0.2px) drop-shadow(0 0 5px rgba(0,0,0,0.5));
-    /* ADDED: Slight distortion and flicker */
-    transform: scale(1.01) skewX(0.5deg) translateY(-0.5%);
-    animation: tv-flicker 0.2s infinite alternate, tv-color-drift 10s infinite alternate;
-}
-
-/* KEYFRAMES FOR ANIMATIONS */
-@keyframes tv-flicker {
-    0% { opacity: 1; }
-    50% { opacity: 0.98; }
-    100% { opacity: 1; }
-}
-
-@keyframes tv-noise {
-    0%, 100% { background-position: 0 0; }
-    10% { background-position: -5% 5%; }
-    20% { background-position: -10% -10%; }
-    30% { background-position: -15% 15%; }
-    40% { background-position: -20% -20%; }
-    50% { background-position: -25% 25%; }
-    60% { background-position: -30% -30%; }
-    70% { background-position: -35% 35%; }
-    80% { background-position: -40% -40%; }
-    90% { background-position: -45% 45%; }
-}
-
-@keyframes tv-color-drift {
-    0% { filter: sepia(0.3) contrast(1.1) brightness(0.9) saturate(1.2) hue-rotate(-5deg) blur(0.2px) drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
-    25% { filter: sepia(0.35) contrast(1.15) brightness(0.92) saturate(1.25) hue-rotate(-8deg) blur(0.1px) drop-shadow(0 0 4px rgba(0,0,0,0.4)); }
-    50% { filter: sepia(0.28) contrast(1.08) brightness(0.88) saturate(1.18) hue-rotate(-3deg) blur(0.3px) drop-shadow(0 0 6px rgba(0,0,0,0.6)); }
-    75% { filter: sepia(0.32) contrast(1.12) brightness(0.91) saturate(1.22) hue-rotate(-6deg) blur(0.15px) drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
-    100% { filter: sepia(0.3) contrast(1.1) brightness(0.9) saturate(1.2) hue-rotate(-5deg) blur(0.2px) drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
-}
-
-/* Light Theme Specific Styles */
-body.light-theme {
-    background-color: #f7fafc; /* gray-50 */
-    color: #1a202c; /* gray-900 */
-}
-.light-theme .tv-container {
-    background: #e2e8f0; /* gray-200 */
-    border-color: #cbd5e0; /* gray-300 */
-    box-shadow: 8px 8px 20px rgba(0,0,0,0.2), inset 4px 4px 10px rgba(0,0,0,0.1);
-}
-.light-theme .tv-screen {
-    border-color: #a0aec0; /* gray-400 */
-}
-.light-theme .text-gray-400,
-.light-theme .text-gray-300 {
-    color: #4a5568; /* gray-700 */
-}
-.light-theme #volume-slider {
-    background-color: #cbd5e0; /* gray-300 */
-}
-.light-theme #settings-modal .modal-content {
-    background-color: #f7fafc;
-    color: #1a202c;
-}
-.light-theme #settings-modal input {
-    background-color: #edf2f7; /* gray-100 */
-    color: #2d3748; /* gray-800 */
-    border-color: #cbd5e0; /* gray-300 */
-}
-.light-theme .theme-btn {
-    border-color: #a0aec0;
-}
-.light-theme .theme-btn.active {
-    background-color: #ef4444;
-    color: white;
-    border-color: #ef4444;
-}
-.light-theme #settings-button,
-.light-theme #close-modal-button,
-.light-theme #reset-timer-button {
-    color: #4a5568;
-    background-color: #edf2f7;
-}
-.light-theme #settings-button:hover,
-.light-theme #close-modal-button:hover,
-.light-theme #reset-timer-button:hover {
-    background-color: #cbd5e0;
-}
+            background: #2d3748; /* gray-800 */
+            border-radius: 2rem;
+            padding: 1.25rem;
+            border: 4px solid #1a202c; /* gray-900 */
+            box-shadow: 8px 8px 20px rgba(0,0,0,0.6), inset 4px 4px 10px rgba(0,0,0,0.4);
+            position: relative;
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .tv-screen {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1.5rem; /* Tighter radius for a more CRT-like screen */
+            background: #000;
+            border: 2px solid #4a5568; /* gray-700 */
+            transition: border-color 0.3s ease;
+            transform: perspective(350px) rotateX(2deg);
+            box-shadow: inset 0 0 50px 15px rgba(0,0,0,0.6); /* Inner shadow for depth */
+        }
+        /* Scanline effect for retro feel */
+        .tv-screen::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(255, 255, 255, 0.04),
+                rgba(255, 255, 255, 0.04) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+            pointer-events: none;
+            z-index: 3;
+            opacity: 0.7; /* Make scanlines more visible */
+            background-color: rgba(0, 255, 0, 0.05); /* Very subtle green tint */
+        }
         #player-container {
              width: 100%;
              padding-top: 56.25%; /* 16:9 Aspect Ratio */
@@ -169,7 +70,23 @@ body.light-theme {
             width: 105%; /* Slightly larger to fill curved corners */
             height: 105%;
             border: none;
-            filter: sepia(0.3) contrast(0.95) brightness(0.95);
+             /* ENHANCED: Added more filter effects for a distressed, older look */
+            filter: sepia(0.3) contrast(1.1) brightness(0.9) saturate(1.2) hue-rotate(-5deg) blur(0.2px) drop-shadow(0 0 5px rgba(0,0,0,0.5));
+            /* ADDED: Slight distortion and flicker */
+            animation: tv-flicker 0.2s infinite alternate, tv-color-drift 10s infinite alternate;
+        }
+
+        /* KEYFRAMES FOR ANIMATIONS */
+        @keyframes tv-flicker {
+            0% { opacity: 1; }
+            50% { opacity: 0.98; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes tv-color-drift {
+            0% { filter: sepia(0.3) contrast(1.1) brightness(0.9) saturate(1.2) hue-rotate(-5deg) blur(0.2px) drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
+            50% { filter: sepia(0.28) contrast(1.08) brightness(0.88) saturate(1.18) hue-rotate(-3deg) blur(0.3px) drop-shadow(0 0 6px rgba(0,0,0,0.6)); }
+            100% { filter: sepia(0.3) contrast(1.1) brightness(0.9) saturate(1.2) hue-rotate(-5deg) blur(0.2px) drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
         }
 
         /* Modal Styles */
@@ -336,7 +253,7 @@ body.light-theme {
             </div>
         </div>
          <div id="error-message" class="mt-4 text-center text-red-400 bg-red-900/50 p-3 rounded-lg hidden"></div>
-         <div id="modal-message" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300"></div>
+         <div id="modal-message" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none"></div>
     </div>
 
     <!-- Settings Modal -->
@@ -361,8 +278,8 @@ body.light-theme {
 
                 <!-- Custom Video URL -->
                 <div>
-                    <label for="video-url" class="block text-sm font-medium text-gray-300 mb-2">Custom YouTube Video URL</label>
-                    <input type="text" id="video-url" class="w-full bg-gray-700 text-white rounded-lg p-2 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="https://www.youtube.com/watch?v=...">
+                    <label for="video-url" class="block text-sm font-medium text-gray-300 mb-2">YouTube Video or Playlist URL</label>
+                    <input type="text" id="video-url" class="w-full bg-gray-700 text-white rounded-lg p-2 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="e.g., https://www.youtube.com/watch?v=...">
                 </div>
 
                 <!-- Pomodoro Settings -->
@@ -429,8 +346,9 @@ body.light-theme {
         let studyDuration = 25 * 60; 
         let restDuration = 5 * 60;
         let isResting = false;
+        let currentPomodoroMode = 'study'; // State for current pomodoro mode
         let pomodoroSeconds = studyDuration;
-        const DEFAULT_VIDEO_ID = 'MAsudG24NVM';
+        const DEFAULT_VIDEO_ID = 'MAsudG24NVM'; // Lofi Girl default stream
         let audioContext;
 
         // --- Initialization ---
@@ -442,11 +360,12 @@ body.light-theme {
 
         // --- YouTube Player Functions ---
         function onYouTubeIframeAPIReady() {
-            const videoId = getYouTubeId(localStorage.getItem('studyVideoUrl')) || DEFAULT_VIDEO_ID;
-            player = new YT.Player('player', {
+            const savedUrl = localStorage.getItem('studyVideoUrl');
+            const parsedUrl = parseYouTubeUrl(savedUrl);
+        
+            const playerConfig = {
                 height: '100%',
                 width: '100%',
-                videoId: videoId,
                 playerVars: { 
                     'autoplay': 0, 'controls': 0, 'modestbranding': 1, 
                     'rel': 0, 'iv_load_policy': 3, 'origin': window.location.origin
@@ -456,7 +375,17 @@ body.light-theme {
                     'onStateChange': onPlayerStateChange,
                     'onError': onPlayerError
                 }
-            });
+            };
+
+            // Load playlist or single video based on saved URL
+            if (parsedUrl.playlistId) {
+                playerConfig.playerVars.listType = 'playlist';
+                playerConfig.playerVars.list = parsedUrl.playlistId;
+            } else {
+                playerConfig.videoId = parsedUrl.videoId || DEFAULT_VIDEO_ID;
+            }
+
+            player = new YT.Player('player', playerConfig);
         }
         
         function onPlayerReady(event) {
@@ -468,6 +397,7 @@ body.light-theme {
         
         function onPlayerError(event) {
             showError("Couldn't play video. Reverting to default.");
+            // Clear the faulty URL from storage so it doesn't try to load it again on refresh
             localStorage.removeItem('studyVideoUrl');
             player.loadVideoById(DEFAULT_VIDEO_ID);
         }
@@ -536,7 +466,7 @@ body.light-theme {
             const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
             const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
             const s = (seconds % 60).toString().padStart(2, '0');
-            return `${h}:${m}:${s}`;
+            return h + ':' + m + ':' + s;
         }
 
         function updateTimerDisplay() {
@@ -544,10 +474,10 @@ body.light-theme {
             timerElement.textContent = formatTime(time);
             
             if(pomodoroEnabled) {
-                timerLabel.textContent = isResting ? "Rest Time" : "Study Time";
+                timerLabel.textContent = isResting ? "Break Time" : "Study Time";
                 timerElement.style.color = isResting ? '#FBBF24' : '#34D399'; // Amber / Green
             } else {
-                timerLabel.textContent = "Total Time";
+                timerLabel.textContent = "Time Studied";
                 timerElement.style.color = '#34D399';
             }
         }
@@ -585,27 +515,36 @@ body.light-theme {
         pomodoroToggle.addEventListener('change', updatePomodoroInputsVisibility);
 
         saveSettingsButton.addEventListener('click', () => {
+            // --- Theme Settings ---
             const activeTheme = document.body.classList.contains('light-theme') ? 'light' : 'dark';
             localStorage.setItem('study-theme', activeTheme);
             applyTheme(activeTheme);
 
-            const videoUrl = videoUrlInput.value;
-            if (videoUrl.trim() === '') {
+            // --- Video URL Settings (UPGRADED) ---
+            const videoUrl = videoUrlInput.value.trim();
+            const currentVideoUrl = localStorage.getItem('studyVideoUrl') || '';
+
+            if (videoUrl === '' && currentVideoUrl !== '') {
                 localStorage.removeItem('studyVideoUrl');
-                if (player.getVideoData().video_id !== DEFAULT_VIDEO_ID) player.loadVideoById(DEFAULT_VIDEO_ID);
-            } else {
-                const newVideoId = getYouTubeId(videoUrl);
-                if (!newVideoId) {
-                    showError("Invalid YouTube URL. Please check and try again.");
-                    return;
-                }
-                const currentVideoId = player.getVideoData().video_id;
-                if (currentVideoId !== newVideoId) {
+                player.loadVideoById(DEFAULT_VIDEO_ID);
+                showMessage("Reverted to default video.");
+            } else if (videoUrl !== '' && videoUrl !== currentVideoUrl) {
+                const parsedUrl = parseYouTubeUrl(videoUrl);
+                if (parsedUrl.playlistId) {
                     localStorage.setItem('studyVideoUrl', videoUrl);
-                    player.loadVideoById(newVideoId);
+                    player.loadPlaylist({ list: parsedUrl.playlistId, listType: 'playlist' });
+                    showMessage("Loading new playlist...");
+                } else if (parsedUrl.videoId) {
+                    localStorage.setItem('studyVideoUrl', videoUrl);
+                    player.loadVideoById(parsedUrl.videoId);
+                    showMessage("Loading new video...");
+                } else {
+                    showError("Invalid YouTube URL. Please use a valid video or playlist URL.");
+                    return; // Stop save process
                 }
             }
 
+            // --- Pomodoro Settings ---
             const wasPomodoroEnabled = pomodoroEnabled;
             pomodoroEnabled = pomodoroToggle.checked;
             const newStudyDurationMins = parseInt(studyDurationInput.value, 10);
@@ -613,9 +552,9 @@ body.light-theme {
 
             if (pomodoroEnabled && (isNaN(newStudyDurationMins) || newStudyDurationMins <= 0 || isNaN(newRestDurationMins) || newRestDurationMins <= 0)) {
                 showError("Durations must be positive numbers.");
-                return;
+                return; // Stop save process
             }
-
+            
             studyDuration = newStudyDurationMins * 60;
             restDuration = newRestDurationMins * 60;
             
@@ -624,20 +563,29 @@ body.light-theme {
             localStorage.setItem('restDuration', restDuration);
 
             if (wasPomodoroEnabled !== pomodoroEnabled) {
-                resetTimer();
-            } else if (pomodoroEnabled) {
-                // If pomodoro was already enabled, just update the current timer
-                if (!isResting) {
-                    pomodoroSeconds = studyDuration;
-                }
+                resetTimer(); // Reset timer if Pomodoro mode was toggled
+            } else if (pomodoroEnabled && !isResting) {
+                // If pomodoro was already on, just update the current study timer
+                pomodoroSeconds = studyDuration;
                 updateTimerDisplay();
             }
             
             closeModal();
         });
+        
+        document.querySelectorAll('.theme-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                applyTheme(button.dataset.theme);
+            });
+        });
 
         // --- Helper & Setup Functions ---
         function loadSettings() {
+            // Theme
+            const savedTheme = localStorage.getItem('study-theme') || 'dark';
+            applyTheme(savedTheme);
+            
+            // Pomodoro
             pomodoroEnabled = localStorage.getItem('pomodoroEnabled') === 'true';
             studyDuration = parseInt(localStorage.getItem('studyDuration'), 10) || (25 * 60);
             restDuration = parseInt(localStorage.getItem('restDuration'), 10) || (5 * 60);
@@ -651,17 +599,18 @@ body.light-theme {
             restDurationInput.value = restDuration / 60;
             pomodoroToggle.checked = pomodoroEnabled;
             updatePomodoroInputsVisibility();
+            
+            const currentTheme = document.body.classList.contains('light-theme') ? 'light' : 'dark';
+            applyTheme(currentTheme); // Ensure modal theme buttons are correct
 
-            settingsModal.classList.remove('hidden');
-            setTimeout(() => {
-                settingsModal.classList.add('open')
-            }, 10); 
+            settingsModal.classList.add('open');
+            settingsModal.style.visibility = 'visible';
         }
 
         function closeModal() {
             settingsModal.classList.remove('open');
             setTimeout(() => {
-                settingsModal.classList.add('hidden');
+                settingsModal.style.visibility = 'hidden';
             }, 300);
         }
 
@@ -670,13 +619,15 @@ body.light-theme {
         }
 
         function applyTheme(themeName) {
-            document.body.classList.remove('light-theme', 'dark-theme');
-            document.body.classList.add(`${themeName}-theme`);
+            document.body.classList.remove('light-theme');
+            if (themeName === 'light') {
+                document.body.classList.add('light-theme');
+            }
             
             document.querySelectorAll('.theme-btn').forEach(b => {
-                b.classList.remove('ring-2', 'ring-red-500', 'active');
+                b.classList.remove('active');
                 if (b.dataset.theme === themeName) {
-                     b.classList.add('ring-2', 'ring-red-500', 'active');
+                     b.classList.add('active');
                 }
             });
         }
@@ -689,20 +640,26 @@ body.light-theme {
         
         function showMessage(message) {
             modalMessage.textContent = message;
-            modalMessage.classList.remove('hidden', 'opacity-0');
-            modalMessage.classList.add('opacity-100');
+            modalMessage.style.opacity = 1;
             setTimeout(() => {
-                modalMessage.classList.remove('opacity-100');
-                modalMessage.classList.add('opacity-0');
-                setTimeout(() => messageEl.classList.add('hidden'), 300);
+                modalMessage.style.opacity = 0;
             }, 2700);
         }
 
-        function getYouTubeId(url) {
-            if (!url) return null;
-            const regExp = /^.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
+        function parseYouTubeUrl(url) {
+            if (!url) return {};
+            const result = {};
+            const videoIdRegex = /^.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const videoMatch = url.match(videoIdRegex);
+            if (videoMatch && videoMatch[1].length === 11) {
+                result.videoId = videoMatch[1];
+            }
+            const playlistIdRegex = /[?&]list=([^#\&\?]*)/;
+            const playlistMatch = url.match(playlistIdRegex);
+            if (playlistMatch && playlistMatch[1]) {
+                result.playlistId = playlistMatch[1];
+            }
+            return result;
         }
 
         function playNotificationSound() {
@@ -734,4 +691,3 @@ body.light-theme {
     </script>
 </body>
 </html>
-
