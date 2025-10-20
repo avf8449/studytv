@@ -9,6 +9,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --curvature-opacity: 0.3;
+            --screen-bulge: 1.03;
+            --scanline-opacity: 0.7;
+            --hue-rotate: -5deg;
+            --player-opacity: 1;
+            --audio-image-opacity: 0;
+        }
         body {
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
@@ -35,8 +43,22 @@
             background: #000;
             border: 2px solid #4a5568; /* gray-700 */
             transition: border-color 0.3s ease;
-            transform: perspective(350px) rotateX(2deg);
             box-shadow: inset 0 0 50px 15px rgba(0,0,0,0.6); /* Inner shadow for depth */
+        }
+        /* NEW: Added pseudo-element for realistic curvature vignette */
+        .tv-screen::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.2) 80%, rgba(0,0,0,0.8) 100%);
+            border-radius: 1.5rem;
+            z-index: 2;
+            pointer-events: none;
+            opacity: var(--curvature-opacity);
+            transition: opacity 0.3s ease;
         }
         /* Scanline effect for retro feel */
         .tv-screen::after {
@@ -55,8 +77,9 @@
             );
             pointer-events: none;
             z-index: 3;
-            opacity: 0.7; /* Make scanlines more visible */
+            opacity: var(--scanline-opacity);
             background-color: rgba(0, 255, 0, 0.05); /* Very subtle green tint */
+            transition: opacity 0.3s ease;
         }
         #player-container {
              width: 100%;
@@ -70,23 +93,39 @@
             width: 105%; /* Slightly larger to fill curved corners */
             height: 105%;
             border: none;
-             /* ENHANCED: Added more filter effects for a distressed, older look */
-            filter: sepia(0.3) contrast(1.1) brightness(0.9) saturate(1.2) hue-rotate(-5deg) blur(0.2px) drop-shadow(0 0 5px rgba(0,0,0,0.5));
-            /* ADDED: Slight distortion and flicker */
+            filter: sepia(0.3) contrast(1.1) brightness(0.9) saturate(1.2) hue-rotate(var(--hue-rotate)) blur(0.2px) drop-shadow(0 0 5px rgba(0,0,0,0.5));
             animation: tv-flicker 0.2s infinite alternate, tv-color-drift 10s infinite alternate;
+            transition: opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease;
+            opacity: var(--player-opacity);
+            transform: scale(var(--screen-bulge));
         }
+        
+        #audio-only-image-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: var(--audio-image-opacity);
+            transition: opacity 0.3s ease;
+            filter: sepia(0.3) contrast(1.1) brightness(0.9) saturate(1.2) hue-rotate(var(--hue-rotate)) blur(0.2px);
+            transform: scale(var(--screen-bulge));
+        }
+
 
         /* KEYFRAMES FOR ANIMATIONS */
         @keyframes tv-flicker {
-            0% { opacity: 1; }
-            50% { opacity: 0.98; }
-            100% { opacity: 1; }
+            0% { opacity: var(--player-opacity); }
+            50% { opacity: calc(var(--player-opacity) * 0.98); }
+            100% { opacity: var(--player-opacity); }
         }
 
         @keyframes tv-color-drift {
-            0% { filter: sepia(0.3) contrast(1.1) brightness(0.9) saturate(1.2) hue-rotate(-5deg) blur(0.2px) drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
-            50% { filter: sepia(0.28) contrast(1.08) brightness(0.88) saturate(1.18) hue-rotate(-3deg) blur(0.3px) drop-shadow(0 0 6px rgba(0,0,0,0.6)); }
-            100% { filter: sepia(0.3) contrast(1.1) brightness(0.9) saturate(1.2) hue-rotate(-5deg) blur(0.2px) drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
+            0% { filter: sepia(0.3) contrast(1.1) brightness(0.9) saturate(1.2) hue-rotate(var(--hue-rotate)) blur(0.2px) drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
+            50% { filter: sepia(0.28) contrast(1.08) brightness(0.88) saturate(1.18) hue-rotate(calc(var(--hue-rotate) - 3deg)) blur(0.3px) drop-shadow(0 0 6px rgba(0,0,0,0.6)); }
+            100% { filter: sepia(0.3) contrast(1.1) brightness(0.9) saturate(1.2) hue-rotate(var(--hue-rotate)) blur(0.2px) drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
         }
 
         /* Modal Styles */
@@ -176,7 +215,7 @@
             background-color: #f7fafc;
             color: #1a202c;
         }
-        .light-theme #settings-modal input {
+        .light-theme #settings-modal input:not([type=range]) {
             background-color: #edf2f7; /* gray-100 */
             color: #2d3748; /* gray-800 */
             border-color: #cbd5e0; /* gray-300 */
@@ -220,6 +259,7 @@
         <div class="tv-container">
             <div class="tv-screen">
                 <div id="player-container">
+                    <div id="audio-only-image-container"></div>
                     <div id="player"></div>
                 </div>
             </div>
@@ -258,7 +298,7 @@
 
     <!-- Settings Modal -->
     <div id="settings-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
-        <div class="modal-content bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm p-6">
+        <div class="modal-content bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm p-6 overflow-y-auto max-h-[90vh]">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold">Settings</h2>
                 <button id="close-modal-button" class="p-2 rounded-full hover:bg-gray-700 transition">
@@ -282,8 +322,40 @@
                     <input type="text" id="video-url" class="w-full bg-gray-700 text-white rounded-lg p-2 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="e.g., https://www.youtube.com/watch?v=...">
                 </div>
 
+                <!-- Visual Settings -->
+                <div class="border-t border-gray-700 pt-4 mt-4">
+                     <h3 class="text-lg font-semibold text-gray-200 mb-4">Visuals</h3>
+                     <div class="space-y-4">
+                        <div>
+                            <label for="curvature-slider" class="block text-sm font-medium text-gray-300 mb-1">Screen Distortion</label>
+                            <input id="curvature-slider" type="range" min="0" max="10" value="3" step="1" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                        </div>
+                        <div>
+                            <label for="scanlines-slider" class="block text-sm font-medium text-gray-300 mb-1">Scanline Intensity</label>
+                            <input id="scanlines-slider" type="range" min="0" max="1" value="0.7" step="0.05" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                        </div>
+                         <div>
+                            <label for="color-shift-slider" class="block text-sm font-medium text-gray-300 mb-1">Color Shift</label>
+                            <input id="color-shift-slider" type="range" min="-30" max="30" value="-5" step="1" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label for="audio-only-toggle" class="block text-sm font-medium text-gray-300">Audio Only Mode</label>
+                            <label class="switch">
+                                <input type="checkbox" id="audio-only-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                         <div id="audio-only-image-url-container" class="hidden">
+                            <label for="audio-only-image-url" class="block text-sm font-medium text-gray-300 mb-1">Custom Image URL</label>
+                            <input type="text" id="audio-only-image-url" class="w-full bg-gray-700 text-white rounded-lg p-2 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="https://...">
+                        </div>
+                     </div>
+                </div>
+
+
                 <!-- Pomodoro Settings -->
                 <div class="border-t border-gray-700 pt-4 mt-4">
+                     <h3 class="text-lg font-semibold text-gray-200 mb-4">Timer</h3>
                     <div class="flex items-center justify-between mb-4">
                         <label for="pomodoro-toggle" class="block text-sm font-medium text-gray-300">Pomodoro Timer</label>
                         <label class="switch">
@@ -331,25 +403,42 @@
         const saveSettingsButton = document.getElementById('save-settings-button');
         const videoUrlInput = document.getElementById('video-url');
         const resetTimerButton = document.getElementById('reset-timer-button');
+        const errorMessage = document.getElementById('error-message');
+        const modalMessage = document.getElementById('modal-message');
+        // Pomodoro
         const pomodoroToggle = document.getElementById('pomodoro-toggle');
         const pomodoroSettingsInputs = document.getElementById('pomodoro-settings-inputs');
         const studyDurationInput = document.getElementById('study-duration');
         const restDurationInput = document.getElementById('rest-duration');
-        const errorMessage = document.getElementById('error-message');
-        const modalMessage = document.getElementById('modal-message');
+        // Visuals
+        const curvatureSlider = document.getElementById('curvature-slider');
+        const scanlinesSlider = document.getElementById('scanlines-slider');
+        const colorShiftSlider = document.getElementById('color-shift-slider');
+        const audioOnlyToggle = document.getElementById('audio-only-toggle');
+        const audioOnlyImageUrlContainer = document.getElementById('audio-only-image-url-container');
+        const audioOnlyImageUrlInput = document.getElementById('audio-only-image-url');
+        const audioOnlyImageContainerDiv = document.getElementById('audio-only-image-container');
         
         // --- Global State ---
         let player;
         let timerInterval = null;
         let totalSecondsStudied = parseInt(localStorage.getItem('totalSecondsStudied') || '0', 10);
+        const DEFAULT_VIDEO_ID = 'MAsudG24NVM'; // Lofi Girl default stream
+        let audioContext;
+        // Pomodoro State
         let pomodoroEnabled = false;
         let studyDuration = 25 * 60; 
         let restDuration = 5 * 60;
         let isResting = false;
-        let currentPomodoroMode = 'study'; // State for current pomodoro mode
+        let currentPomodoroMode = 'study';
         let pomodoroSeconds = studyDuration;
-        const DEFAULT_VIDEO_ID = 'MAsudG24NVM'; // Lofi Girl default stream
-        let audioContext;
+        // Visuals State
+        let screenDistortion = 3;
+        let scanlineIntensity = 0.7;
+        let colorShift = -5;
+        let audioOnly = false;
+        let audioOnlyImageUrl = '';
+
 
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -377,7 +466,6 @@
                 }
             };
 
-            // Load playlist or single video based on saved URL
             if (parsedUrl.playlistId) {
                 playerConfig.playerVars.listType = 'playlist';
                 playerConfig.playerVars.list = parsedUrl.playlistId;
@@ -397,7 +485,6 @@
         
         function onPlayerError(event) {
             showError("Couldn't play video. Reverting to default.");
-            // Clear the faulty URL from storage so it doesn't try to load it again on refresh
             localStorage.removeItem('studyVideoUrl');
             player.loadVideoById(DEFAULT_VIDEO_ID);
         }
@@ -416,7 +503,7 @@
 
         // --- Timer Logic ---
         function startTimer() {
-            if (timerInterval) return; // Prevent multiple intervals
+            if (timerInterval) return;
             timerInterval = setInterval(() => {
                 if (pomodoroEnabled) {
                     pomodoroSeconds--;
@@ -457,16 +544,14 @@
             }
             updateTimerDisplay();
             
-            if (wasPlaying) {
-                startTimer();
-            }
+            if (wasPlaying) startTimer();
         }
 
         function formatTime(seconds) {
             const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
             const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
             const s = (seconds % 60).toString().padStart(2, '0');
-            return h + ':' + m + ':' + s;
+            return `${h}:${m}:${s}`;
         }
 
         function updateTimerDisplay() {
@@ -486,11 +571,8 @@
         togglePlayButton.addEventListener('click', () => {
             if (!player || typeof player.getPlayerState !== 'function') return;
             const playerState = player.getPlayerState();
-            if (playerState === YT.PlayerState.PLAYING) {
-                player.pauseVideo();
-            } else {
-                player.playVideo();
-            }
+            if (playerState === YT.PlayerState.PLAYING) player.pauseVideo();
+            else player.playVideo();
         });
 
         volumeSlider.addEventListener('input', (e) => {
@@ -512,18 +594,28 @@
              showMessage("Timer reset!");
         });
 
-        pomodoroToggle.addEventListener('change', updatePomodoroInputsVisibility);
-
         saveSettingsButton.addEventListener('click', () => {
             // --- Theme Settings ---
             const activeTheme = document.body.classList.contains('light-theme') ? 'light' : 'dark';
             localStorage.setItem('study-theme', activeTheme);
-            applyTheme(activeTheme);
+            
+            // --- Visuals Settings ---
+            screenDistortion = parseInt(curvatureSlider.value, 10);
+            scanlineIntensity = parseFloat(scanlinesSlider.value);
+            colorShift = parseInt(colorShiftSlider.value, 10);
+            audioOnly = audioOnlyToggle.checked;
+            audioOnlyImageUrl = audioOnlyImageUrlInput.value.trim();
 
-            // --- Video URL Settings (UPGRADED) ---
+            localStorage.setItem('screenDistortion', screenDistortion);
+            localStorage.setItem('scanlineIntensity', scanlineIntensity);
+            localStorage.setItem('colorShift', colorShift);
+            localStorage.setItem('audioOnly', audioOnly);
+            localStorage.setItem('audioOnlyImageUrl', audioOnlyImageUrl);
+            applyFilterSettings(); // Apply the final saved values
+
+            // --- Video URL Settings ---
             const videoUrl = videoUrlInput.value.trim();
             const currentVideoUrl = localStorage.getItem('studyVideoUrl') || '';
-
             if (videoUrl === '' && currentVideoUrl !== '') {
                 localStorage.removeItem('studyVideoUrl');
                 player.loadVideoById(DEFAULT_VIDEO_ID);
@@ -540,7 +632,7 @@
                     showMessage("Loading new video...");
                 } else {
                     showError("Invalid YouTube URL. Please use a valid video or playlist URL.");
-                    return; // Stop save process
+                    return;
                 }
             }
 
@@ -552,20 +644,17 @@
 
             if (pomodoroEnabled && (isNaN(newStudyDurationMins) || newStudyDurationMins <= 0 || isNaN(newRestDurationMins) || newRestDurationMins <= 0)) {
                 showError("Durations must be positive numbers.");
-                return; // Stop save process
+                return;
             }
             
             studyDuration = newStudyDurationMins * 60;
             restDuration = newRestDurationMins * 60;
-            
             localStorage.setItem('pomodoroEnabled', String(pomodoroEnabled));
             localStorage.setItem('studyDuration', studyDuration);
             localStorage.setItem('restDuration', restDuration);
 
-            if (wasPomodoroEnabled !== pomodoroEnabled) {
-                resetTimer(); // Reset timer if Pomodoro mode was toggled
-            } else if (pomodoroEnabled && !isResting) {
-                // If pomodoro was already on, just update the current study timer
+            if (wasPomodoroEnabled !== pomodoroEnabled) resetTimer();
+            else if (pomodoroEnabled && !isResting) {
                 pomodoroSeconds = studyDuration;
                 updateTimerDisplay();
             }
@@ -574,44 +663,95 @@
         });
         
         document.querySelectorAll('.theme-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                applyTheme(button.dataset.theme);
-            });
+            button.addEventListener('click', () => applyTheme(button.dataset.theme));
         });
+
+        // --- Real-time Visuals Update ---
+        curvatureSlider.addEventListener('input', (e) => {
+            const distortionValue = parseInt(e.target.value, 10);
+            const bulge = 1 + (distortionValue / 100);
+            const vignette = distortionValue / 10;
+            document.documentElement.style.setProperty('--screen-bulge', bulge);
+            document.documentElement.style.setProperty('--curvature-opacity', vignette);
+        });
+        scanlinesSlider.addEventListener('input', (e) => document.documentElement.style.setProperty('--scanline-opacity', e.target.value));
+        colorShiftSlider.addEventListener('input', (e) => document.documentElement.style.setProperty('--hue-rotate', `${e.target.value}deg`));
+        audioOnlyToggle.addEventListener('change', (e) => {
+            const isChecked = e.target.checked;
+            document.documentElement.style.setProperty('--player-opacity', isChecked ? '0' : '1');
+            document.documentElement.style.setProperty('--audio-image-opacity', isChecked ? '1' : '0');
+            audioOnlyImageUrlContainer.classList.toggle('hidden', !isChecked);
+        });
+        pomodoroToggle.addEventListener('change', () => pomodoroSettingsInputs.classList.toggle('hidden', !pomodoroToggle.checked));
+
 
         // --- Helper & Setup Functions ---
         function loadSettings() {
             // Theme
-            const savedTheme = localStorage.getItem('study-theme') || 'dark';
-            applyTheme(savedTheme);
+            applyTheme(localStorage.getItem('study-theme') || 'dark');
             
+            // Visuals
+            screenDistortion = parseInt(localStorage.getItem('screenDistortion') || '3', 10);
+            scanlineIntensity = parseFloat(localStorage.getItem('scanlineIntensity') || '0.7');
+            colorShift = parseInt(localStorage.getItem('colorShift') || '-5', 10);
+            audioOnly = localStorage.getItem('audioOnly') === 'true';
+            audioOnlyImageUrl = localStorage.getItem('audioOnlyImageUrl') || '';
+            applyFilterSettings();
+
             // Pomodoro
             pomodoroEnabled = localStorage.getItem('pomodoroEnabled') === 'true';
             studyDuration = parseInt(localStorage.getItem('studyDuration'), 10) || (25 * 60);
             restDuration = parseInt(localStorage.getItem('restDuration'), 10) || (5 * 60);
-            pomodoroSeconds = studyDuration; // Always start with a study session
+            pomodoroSeconds = studyDuration;
             isResting = false;
         }
 
         function openModal() {
+            // Populate inputs with current saved state
             videoUrlInput.value = localStorage.getItem('studyVideoUrl') || '';
+            curvatureSlider.value = screenDistortion;
+            scanlinesSlider.value = scanlineIntensity;
+            colorShiftSlider.value = colorShift;
+            audioOnlyToggle.checked = audioOnly;
+            audioOnlyImageUrlInput.value = audioOnlyImageUrl;
+            audioOnlyImageUrlContainer.classList.toggle('hidden', !audioOnly);
+
             studyDurationInput.value = studyDuration / 60;
             restDurationInput.value = restDuration / 60;
             pomodoroToggle.checked = pomodoroEnabled;
-            updatePomodoroInputsVisibility();
             
-            const currentTheme = document.body.classList.contains('light-theme') ? 'light' : 'dark';
-            applyTheme(currentTheme); // Ensure modal theme buttons are correct
-
+            updatePomodoroInputsVisibility();
+            applyTheme(localStorage.getItem('study-theme') || 'dark');
             settingsModal.classList.add('open');
             settingsModal.style.visibility = 'visible';
         }
 
         function closeModal() {
             settingsModal.classList.remove('open');
+            // Revert any unsaved visual changes back to the saved state
+            applyFilterSettings();
             setTimeout(() => {
                 settingsModal.style.visibility = 'hidden';
             }, 300);
+        }
+        
+        function applyFilterSettings() {
+            const root = document.documentElement;
+            const bulge = 1 + (screenDistortion / 100);
+            const vignette = screenDistortion / 10;
+            root.style.setProperty('--screen-bulge', bulge);
+            root.style.setProperty('--curvature-opacity', vignette);
+            
+            root.style.setProperty('--scanline-opacity', scanlineIntensity);
+            root.style.setProperty('--hue-rotate', `${colorShift}deg`);
+            root.style.setProperty('--player-opacity', audioOnly ? '0' : '1');
+            
+            if (audioOnly && audioOnlyImageUrl) {
+                audioOnlyImageContainerDiv.style.backgroundImage = `url('${audioOnlyImageUrl}')`;
+                root.style.setProperty('--audio-image-opacity', '1');
+            } else {
+                root.style.setProperty('--audio-image-opacity', '0');
+            }
         }
 
         function updatePomodoroInputsVisibility() {
@@ -619,16 +759,9 @@
         }
 
         function applyTheme(themeName) {
-            document.body.classList.remove('light-theme');
-            if (themeName === 'light') {
-                document.body.classList.add('light-theme');
-            }
-            
+            document.body.classList.toggle('light-theme', themeName === 'light');
             document.querySelectorAll('.theme-btn').forEach(b => {
-                b.classList.remove('active');
-                if (b.dataset.theme === themeName) {
-                     b.classList.add('active');
-                }
+                b.classList.toggle('active', b.dataset.theme === themeName);
             });
         }
 
@@ -641,9 +774,7 @@
         function showMessage(message) {
             modalMessage.textContent = message;
             modalMessage.style.opacity = 1;
-            setTimeout(() => {
-                modalMessage.style.opacity = 0;
-            }, 2700);
+            setTimeout(() => { modalMessage.style.opacity = 0; }, 2700);
         }
 
         function parseYouTubeUrl(url) {
@@ -651,22 +782,18 @@
             const result = {};
             const videoIdRegex = /^.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             const videoMatch = url.match(videoIdRegex);
-            if (videoMatch && videoMatch[1].length === 11) {
-                result.videoId = videoMatch[1];
-            }
+            if (videoMatch && videoMatch[1].length === 11) result.videoId = videoMatch[1];
+            
             const playlistIdRegex = /[?&]list=([^#\&\?]*)/;
             const playlistMatch = url.match(playlistIdRegex);
-            if (playlistMatch && playlistMatch[1]) {
-                result.playlistId = playlistMatch[1];
-            }
+            if (playlistMatch && playlistMatch[1]) result.playlistId = playlistMatch[1];
+            
             return result;
         }
 
         function playNotificationSound() {
             try {
-                if (!audioContext) {
-                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                }
+                if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
                 oscillator.connect(gainNode);
@@ -691,3 +818,5 @@
     </script>
 </body>
 </html>
+
+
