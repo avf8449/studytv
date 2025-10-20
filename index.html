@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lofi Study TV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="manifest" id="manifest">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme transitions */
+        }
+        .timer-font {
+            font-family: 'VT323', monospace;
+        }
+        
+        .tv-container {
+    background: #2d3748; /* gray-800 */
+    border-radius: 2rem;
+    padding: 1.25rem;
+    border: 4px solid #1a202c; /* gray-900 */
+    box-shadow: 8px 8px 20px rgba(0,0,0,0.6), inset 4px 4px 10px rgba(0,0,0,0.4);
+    position: relative;
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.tv-screen {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.5rem; /* Tighter radius for a more CRT-like screen */
+    background: #000;
+    border: 2px solid #4a5568; /* gray-700 */
+    transition: border-color 0.3s ease;
+    /* This creates the curved screen effect */
+    transform: perspective(350px) rotateX(2deg);
+    box-shadow: inset 0 0 50px 15px rgba(0,0,0,0.6); /* Inner shadow for depth */
+
+    /* ADDED: Subtle static/noise effect on the screen */
+    animation: tv-noise 8s infinite step-end;
+}
+/* Scanline effect for retro feel */
+.tv-screen::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(255, 255, 255, 0.04),
+        rgba(255, 255, 255, 0.04) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    pointer-events: none;
+    z-index: 3; /* Ensure scanlines are on top */
+    /* ADDED: More noticeable scanline effect, and a subtle color tint */
+    opacity: 0.7; /* Make scanlines more visible */
+    background-color: rgba(0, 255, 0, 0.05); /* Very subtle green tint for old monitors */
+}
+#player-container {
+     width: 100%;
+     padding-top: 56.25%; /* 16:9 Aspect Ratio */
+     position: relative;
+}
+#player {
+    position: absolute;
+    top: -2.5%;
+    left: -5%;
+    width: 105%; /* Slightly larger to fill curved corners */
+    height: 105%;
+    border: none;
+    /* ENHANCED: Added more filter effects for a distressed, older look */
+    filter: sepia(0.3) contrast(1.1) brightness(0.9) saturate(1.2) hue-rotate(-5deg) blur(0.2px) drop-shadow(0 0 5px rgba(0,0,0,0.5));
+    /* ADDED: Slight distortion and flicker */
+    transform: scale(1.01) skewX(0.5deg) translateY(-0.5%);
+    animation: tv-flicker 0.2s infinite alternate, tv-color-drift 10s infinite alternate;
+}
+
+/* KEYFRAMES FOR ANIMATIONS */
+@keyframes tv-flicker {
+    0% { opacity: 1; }
+    50% { opacity: 0.98; }
+    100% { opacity: 1; }
+}
+
+@keyframes tv-noise {
+    0%, 100% { background-position: 0 0; }
+    10% { background-position: -5% 5%; }
+    20% { background-position: -10% -10%; }
+    30% { background-position: -15% 15%; }
+    40% { background-position: -20% -20%; }
+    50% { background-position: -25% 25%; }
+    60% { background-position: -30% -30%; }
+    70% { background-position: -35% 35%; }
+    80% { background-position: -40% -40%; }
+    90% { background-position: -45% 45%; }
+}
+
+@keyframes tv-color-drift {
+    0% { filter: sepia(0.3) contrast(1.1) brightness(0.9) saturate(1.2) hue-rotate(-5deg) blur(0.2px) drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
+    25% { filter: sepia(0.35) contrast(1.15) brightness(0.92) saturate(1.25) hue-rotate(-8deg) blur(0.1px) drop-shadow(0 0 4px rgba(0,0,0,0.4)); }
+    50% { filter: sepia(0.28) contrast(1.08) brightness(0.88) saturate(1.18) hue-rotate(-3deg) blur(0.3px) drop-shadow(0 0 6px rgba(0,0,0,0.6)); }
+    75% { filter: sepia(0.32) contrast(1.12) brightness(0.91) saturate(1.22) hue-rotate(-6deg) blur(0.15px) drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
+    100% { filter: sepia(0.3) contrast(1.1) brightness(0.9) saturate(1.2) hue-rotate(-5deg) blur(0.2px) drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
+}
+
+/* Light Theme Specific Styles */
+body.light-theme {
+    background-color: #f7fafc; /* gray-50 */
+    color: #1a202c; /* gray-900 */
+}
+.light-theme .tv-container {
+    background: #e2e8f0; /* gray-200 */
+    border-color: #cbd5e0; /* gray-300 */
+    box-shadow: 8px 8px 20px rgba(0,0,0,0.2), inset 4px 4px 10px rgba(0,0,0,0.1);
+}
+.light-theme .tv-screen {
+    border-color: #a0aec0; /* gray-400 */
+}
+.light-theme .text-gray-400,
+.light-theme .text-gray-300 {
+    color: #4a5568; /* gray-700 */
+}
+.light-theme #volume-slider {
+    background-color: #cbd5e0; /* gray-300 */
+}
+.light-theme #settings-modal .modal-content {
+    background-color: #f7fafc;
+    color: #1a202c;
+}
+.light-theme #settings-modal input {
+    background-color: #edf2f7; /* gray-100 */
+    color: #2d3748; /* gray-800 */
+    border-color: #cbd5e0; /* gray-300 */
+}
+.light-theme .theme-btn {
+    border-color: #a0aec0;
+}
+.light-theme .theme-btn.active {
+    background-color: #ef4444;
+    color: white;
+    border-color: #ef4444;
+}
+.light-theme #settings-button,
+.light-theme #close-modal-button,
+.light-theme #reset-timer-button {
+    color: #4a5568;
+    background-color: #edf2f7;
+}
+.light-theme #settings-button:hover,
+.light-theme #close-modal-button:hover,
+.light-theme #reset-timer-button:hover {
+    background-color: #cbd5e0;
+}
+        #player-container {
+             width: 100%;
+             padding-top: 56.25%; /* 16:9 Aspect Ratio */
+             position: relative;
+        }
+        #player {
+            position: absolute;
+            top: -2.5%; 
+            left: -5%;
+            width: 105%; /* Slightly larger to fill curved corners */
+            height: 105%;
+            border: none;
+            filter: sepia(0.3) contrast(0.95) brightness(0.95);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s 0.3s, opacity 0.3s ease;
+        }
+        .modal-content {
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.open {
+            visibility: visible;
+            opacity: 1;
+            transition-delay: 0s;
+        }
+        .modal-overlay.open .modal-content {
+            transform: scale(1);
+        }
+
+        /* Custom switch for Pomodoro toggle */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #4a5568;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #ef4444;
+        }
+        input:focus + .slider {
+            box-shadow: 0 0 1px #ef4444;
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Light Theme Specific Styles */
+        body.light-theme {
+            background-color: #f7fafc; /* gray-50 */
+            color: #1a202c; /* gray-900 */
+        }
+        .light-theme .tv-container {
+            background: #e2e8f0; /* gray-200 */
+            border-color: #cbd5e0; /* gray-300 */
+            box-shadow: 8px 8px 20px rgba(0,0,0,0.2), inset 4px 4px 10px rgba(0,0,0,0.1);
+        }
+        .light-theme .tv-screen {
+            border-color: #a0aec0; /* gray-400 */
+        }
+        .light-theme .text-gray-400,
+        .light-theme .text-gray-300 {
+            color: #4a5568; /* gray-700 */
+        }
+        .light-theme #volume-slider {
+            background-color: #cbd5e0; /* gray-300 */
+        }
+        .light-theme #settings-modal .modal-content {
+            background-color: #f7fafc;
+            color: #1a202c;
+        }
+        .light-theme #settings-modal input {
+            background-color: #edf2f7; /* gray-100 */
+            color: #2d3748; /* gray-800 */
+            border-color: #cbd5e0; /* gray-300 */
+        }
+        .light-theme .theme-btn {
+            border-color: #a0aec0;
+        }
+        .light-theme .theme-btn.active { 
+            background-color: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+        .light-theme #settings-button,
+        .light-theme #close-modal-button,
+        .light-theme #reset-timer-button {
+            color: #4a5568; 
+            background-color: #edf2f7;
+        }
+        .light-theme #settings-button:hover,
+        .light-theme #close-modal-button:hover,
+        .light-theme #reset-timer-button:hover {
+            background-color: #cbd5e0;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-lg mx-auto">
+        <div class="flex items-center justify-between mb-4 px-2">
+            <div class="flex items-center space-x-3">
+                <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                <h1 class="text-2xl font-bold">Lofi Study TV</h1>
+            </div>
+            <!-- Settings Button -->
+            <button id="settings-button" class="p-2 rounded-full hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.532 1.532 0 012.287-.947c1.372.836 2.942-.734-2.106-2.106a1.532 1.532 0 01-.947-2.287c1.561-.379-1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
+            </button>
+        </div>
+        
+        <!-- Retro TV Container -->
+        <div class="tv-container">
+            <div class="tv-screen">
+                <div id="player-container">
+                    <div id="player"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls Section -->
+        <div id="controls" class="mt-6 px-2">
+            <div class="flex items-center justify-between">
+                <!-- Play/Pause Button -->
+                <button id="toggle-play-button" class="bg-red-600 hover:bg-red-700 text-white font-semibold p-4 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition duration-300 flex items-center justify-center">
+                    <svg id="play-icon" class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8.068v3.864a1 1 0 001.555.832l3.333-1.932a1 1 0 000-1.664l-3.333-1.932z" clip-rule="evenodd"></path></svg>
+                    <svg id="pause-icon" class="w-8 h-8 hidden" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                </button>
+                <!-- Study Timer / Countdown Timer -->
+                <div class="text-center flex flex-col items-center">
+                    <p id="timer-label" class="text-sm text-gray-400">Time Studied</p>
+                    <div class="flex items-center space-x-2 mt-1">
+                        <div id="timer" class="text-4xl timer-font text-green-400">00:00:00</div>
+                        <button id="reset-timer-button" title="Reset Timer" class="p-2 rounded-full hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition text-gray-400">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h5M19.5 12a9 9 0 11-1.571-5.021" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <!-- Volume Control -->
+                <div class="flex items-center space-x-2 w-1/3">
+                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+                     <input id="volume-slider" type="range" min="0" max="100" value="80" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                </div>
+            </div>
+        </div>
+         <div id="error-message" class="mt-4 text-center text-red-400 bg-red-900/50 p-3 rounded-lg hidden"></div>
+         <div id="modal-message" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300"></div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
+        <div class="modal-content bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Settings</h2>
+                <button id="close-modal-button" class="p-2 rounded-full hover:bg-gray-700 transition">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                </button>
+            </div>
+            
+            <div class="space-y-6">
+                <!-- Theme Selector -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Theme</label>
+                    <div class="flex space-x-2">
+                        <button class="theme-btn flex-1 p-2 rounded-lg border-2 border-gray-600" data-theme="dark">Dark</button>
+                        <button class="theme-btn flex-1 p-2 rounded-lg border-2 border-gray-600" data-theme="light">Light</button>
+                    </div>
+                </div>
+
+                <!-- Custom Video URL -->
+                <div>
+                    <label for="video-url" class="block text-sm font-medium text-gray-300 mb-2">Custom YouTube Video URL</label>
+                    <input type="text" id="video-url" class="w-full bg-gray-700 text-white rounded-lg p-2 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="https://www.youtube.com/watch?v=...">
+                </div>
+
+                <!-- Pomodoro Settings -->
+                <div class="border-t border-gray-700 pt-4 mt-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <label for="pomodoro-toggle" class="block text-sm font-medium text-gray-300">Pomodoro Timer</label>
+                        <label class="switch">
+                            <input type="checkbox" id="pomodoro-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div id="pomodoro-settings-inputs" class="space-y-4 hidden">
+                        <div>
+                            <label for="study-duration" class="block text-sm font-medium text-gray-300 mb-2">Study Time (minutes)</label>
+                            <input type="number" id="study-duration" min="1" class="w-full bg-gray-700 text-white rounded-lg p-2 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label for="rest-duration" class="block text-sm font-medium text-gray-300 mb-2">Rest Time (minutes)</label>
+                            <input type="number" id="rest-duration" min="1" class="w-full bg-gray-700 text-white rounded-lg p-2 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500">
+                        </div>
+                    </div>
+                </div>
+                <button id="save-settings-button" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- YouTube Player API setup ---
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        // --- DOM Elements ---
+        const playIcon = document.getElementById('play-icon');
+        const pauseIcon = document.getElementById('pause-icon');
+        const togglePlayButton = document.getElementById('toggle-play-button');
+        const timerElement = document.getElementById('timer');
+        const timerLabel = document.getElementById('timer-label');
+        const volumeSlider = document.getElementById('volume-slider');
+        const settingsButton = document.getElementById('settings-button');
+        const closeModalButton = document.getElementById('close-modal-button');
+        const settingsModal = document.getElementById('settings-modal');
+        const saveSettingsButton = document.getElementById('save-settings-button');
+        const videoUrlInput = document.getElementById('video-url');
+        const resetTimerButton = document.getElementById('reset-timer-button');
+        const pomodoroToggle = document.getElementById('pomodoro-toggle');
+        const pomodoroSettingsInputs = document.getElementById('pomodoro-settings-inputs');
+        const studyDurationInput = document.getElementById('study-duration');
+        const restDurationInput = document.getElementById('rest-duration');
+        const errorMessage = document.getElementById('error-message');
+        const modalMessage = document.getElementById('modal-message');
+        
+        // --- Global State ---
+        let player;
+        let timerInterval = null;
+        let totalSecondsStudied = parseInt(localStorage.getItem('totalSecondsStudied') || '0', 10);
+        let pomodoroEnabled = false;
+        let studyDuration = 25 * 60; 
+        let restDuration = 5 * 60;
+        let isResting = false;
+        let pomodoroSeconds = studyDuration;
+        const DEFAULT_VIDEO_ID = 'MAsudG24NVM';
+        let audioContext;
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSettings();
+            updateTimerDisplay();
+            setupPWA();
+        });
+
+        // --- YouTube Player Functions ---
+        function onYouTubeIframeAPIReady() {
+            const videoId = getYouTubeId(localStorage.getItem('studyVideoUrl')) || DEFAULT_VIDEO_ID;
+            player = new YT.Player('player', {
+                height: '100%',
+                width: '100%',
+                videoId: videoId,
+                playerVars: { 
+                    'autoplay': 0, 'controls': 0, 'modestbranding': 1, 
+                    'rel': 0, 'iv_load_policy': 3, 'origin': window.location.origin
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange,
+                    'onError': onPlayerError
+                }
+            });
+        }
+        
+        function onPlayerReady(event) {
+            const savedVolume = localStorage.getItem('playerVolume') || 80;
+            player.setVolume(savedVolume);
+            volumeSlider.value = savedVolume;
+            togglePlayButton.disabled = false;
+        }
+        
+        function onPlayerError(event) {
+            showError("Couldn't play video. Reverting to default.");
+            localStorage.removeItem('studyVideoUrl');
+            player.loadVideoById(DEFAULT_VIDEO_ID);
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING) {
+                playIcon.classList.add('hidden');
+                pauseIcon.classList.remove('hidden');
+                startTimer();
+            } else {
+                playIcon.classList.remove('hidden');
+                pauseIcon.classList.add('hidden');
+                stopTimer();
+            }
+        }
+
+        // --- Timer Logic ---
+        function startTimer() {
+            if (timerInterval) return; // Prevent multiple intervals
+            timerInterval = setInterval(() => {
+                if (pomodoroEnabled) {
+                    pomodoroSeconds--;
+                    if (currentPomodoroMode === 'study') {
+                        totalSecondsStudied++;
+                        localStorage.setItem('totalSecondsStudied', totalSecondsStudied);
+                    }
+                    if (pomodoroSeconds < 0) {
+                        isResting = !isResting;
+                        currentPomodoroMode = isResting ? 'rest' : 'study';
+                        pomodoroSeconds = isResting ? restDuration : studyDuration;
+                        showMessage(isResting ? "Time for a break!" : "Time to study!");
+                        playNotificationSound();
+                    }
+                } else {
+                    totalSecondsStudied++;
+                    localStorage.setItem('totalSecondsStudied', totalSecondsStudied);
+                }
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+        
+        function resetTimer() {
+            const wasPlaying = player && player.getPlayerState() === YT.PlayerState.PLAYING;
+            stopTimer(); 
+            if (pomodoroEnabled) {
+                isResting = false;
+                currentPomodoroMode = 'study';
+                pomodoroSeconds = studyDuration;
+            } else {
+                totalSecondsStudied = 0;
+                localStorage.setItem('totalSecondsStudied', 0);
+            }
+            updateTimerDisplay();
+            
+            if (wasPlaying) {
+                startTimer();
+            }
+        }
+
+        function formatTime(seconds) {
+            const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+            const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            return `${h}:${m}:${s}`;
+        }
+
+        function updateTimerDisplay() {
+            const time = pomodoroEnabled ? pomodoroSeconds : totalSecondsStudied;
+            timerElement.textContent = formatTime(time);
+            
+            if(pomodoroEnabled) {
+                timerLabel.textContent = isResting ? "Rest Time" : "Study Time";
+                timerElement.style.color = isResting ? '#FBBF24' : '#34D399'; // Amber / Green
+            } else {
+                timerLabel.textContent = "Total Time";
+                timerElement.style.color = '#34D399';
+            }
+        }
+
+        // --- UI Event Handlers ---
+        togglePlayButton.addEventListener('click', () => {
+            if (!player || typeof player.getPlayerState !== 'function') return;
+            const playerState = player.getPlayerState();
+            if (playerState === YT.PlayerState.PLAYING) {
+                player.pauseVideo();
+            } else {
+                player.playVideo();
+            }
+        });
+
+        volumeSlider.addEventListener('input', (e) => {
+            if (player && typeof player.setVolume === 'function') {
+                const volume = parseInt(e.target.value, 10);
+                player.setVolume(volume);
+                localStorage.setItem('playerVolume', volume);
+            }
+        });
+
+        settingsButton.addEventListener('click', openModal);
+        closeModalButton.addEventListener('click', closeModal);
+        settingsModal.addEventListener('click', (e) => {
+            if (e.target === settingsModal) closeModal();
+        });
+
+        resetTimerButton.addEventListener('click', () => {
+             resetTimer();
+             showMessage("Timer reset!");
+        });
+
+        pomodoroToggle.addEventListener('change', updatePomodoroInputsVisibility);
+
+        saveSettingsButton.addEventListener('click', () => {
+            const activeTheme = document.body.classList.contains('light-theme') ? 'light' : 'dark';
+            localStorage.setItem('study-theme', activeTheme);
+            applyTheme(activeTheme);
+
+            const videoUrl = videoUrlInput.value;
+            if (videoUrl.trim() === '') {
+                localStorage.removeItem('studyVideoUrl');
+                if (player.getVideoData().video_id !== DEFAULT_VIDEO_ID) player.loadVideoById(DEFAULT_VIDEO_ID);
+            } else {
+                const newVideoId = getYouTubeId(videoUrl);
+                if (!newVideoId) {
+                    showError("Invalid YouTube URL. Please check and try again.");
+                    return;
+                }
+                const currentVideoId = player.getVideoData().video_id;
+                if (currentVideoId !== newVideoId) {
+                    localStorage.setItem('studyVideoUrl', videoUrl);
+                    player.loadVideoById(newVideoId);
+                }
+            }
+
+            const wasPomodoroEnabled = pomodoroEnabled;
+            pomodoroEnabled = pomodoroToggle.checked;
+            const newStudyDurationMins = parseInt(studyDurationInput.value, 10);
+            const newRestDurationMins = parseInt(restDurationInput.value, 10);
+
+            if (pomodoroEnabled && (isNaN(newStudyDurationMins) || newStudyDurationMins <= 0 || isNaN(newRestDurationMins) || newRestDurationMins <= 0)) {
+                showError("Durations must be positive numbers.");
+                return;
+            }
+
+            studyDuration = newStudyDurationMins * 60;
+            restDuration = newRestDurationMins * 60;
+            
+            localStorage.setItem('pomodoroEnabled', String(pomodoroEnabled));
+            localStorage.setItem('studyDuration', studyDuration);
+            localStorage.setItem('restDuration', restDuration);
+
+            if (wasPomodoroEnabled !== pomodoroEnabled) {
+                resetTimer();
+            } else if (pomodoroEnabled) {
+                // If pomodoro was already enabled, just update the current timer
+                if (!isResting) {
+                    pomodoroSeconds = studyDuration;
+                }
+                updateTimerDisplay();
+            }
+            
+            closeModal();
+        });
+
+        // --- Helper & Setup Functions ---
+        function loadSettings() {
+            pomodoroEnabled = localStorage.getItem('pomodoroEnabled') === 'true';
+            studyDuration = parseInt(localStorage.getItem('studyDuration'), 10) || (25 * 60);
+            restDuration = parseInt(localStorage.getItem('restDuration'), 10) || (5 * 60);
+            pomodoroSeconds = studyDuration; // Always start with a study session
+            isResting = false;
+        }
+
+        function openModal() {
+            videoUrlInput.value = localStorage.getItem('studyVideoUrl') || '';
+            studyDurationInput.value = studyDuration / 60;
+            restDurationInput.value = restDuration / 60;
+            pomodoroToggle.checked = pomodoroEnabled;
+            updatePomodoroInputsVisibility();
+
+            settingsModal.classList.remove('hidden');
+            setTimeout(() => {
+                settingsModal.classList.add('open')
+            }, 10); 
+        }
+
+        function closeModal() {
+            settingsModal.classList.remove('open');
+            setTimeout(() => {
+                settingsModal.classList.add('hidden');
+            }, 300);
+        }
+
+        function updatePomodoroInputsVisibility() {
+            pomodoroSettingsInputs.classList.toggle('hidden', !pomodoroToggle.checked);
+        }
+
+        function applyTheme(themeName) {
+            document.body.classList.remove('light-theme', 'dark-theme');
+            document.body.classList.add(`${themeName}-theme`);
+            
+            document.querySelectorAll('.theme-btn').forEach(b => {
+                b.classList.remove('ring-2', 'ring-red-500', 'active');
+                if (b.dataset.theme === themeName) {
+                     b.classList.add('ring-2', 'ring-red-500', 'active');
+                }
+            });
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+            setTimeout(() => errorMessage.classList.add('hidden'), 4000);
+        }
+        
+        function showMessage(message) {
+            modalMessage.textContent = message;
+            modalMessage.classList.remove('hidden', 'opacity-0');
+            modalMessage.classList.add('opacity-100');
+            setTimeout(() => {
+                modalMessage.classList.remove('opacity-100');
+                modalMessage.classList.add('opacity-0');
+                setTimeout(() => messageEl.classList.add('hidden'), 300);
+            }, 2700);
+        }
+
+        function getYouTubeId(url) {
+            if (!url) return null;
+            const regExp = /^.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function playNotificationSound() {
+            try {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(880, audioContext.currentTime); // A5 note
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 1);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 1);
+            } catch (e) {
+                console.error("Could not play sound:", e);
+            }
+        }
+        
+        function setupPWA() {
+             const manifest = { "name": "Lofi Study TV", "short_name": "Study TV", "start_url": ".", "display": "standalone", "background_color": "#1a202c", "theme_color": "#ef4444", "description": "A retro TV PWA for lofi study sessions.", "icons": [ { "src": "https://placehold.co/192x192/ef4444/ffffff?text=TV", "sizes": "192x192", "type": "image/png" }, { "src": "https://placehold.co/512x512/ef4444/ffffff?text=TV", "sizes": "512x512", "type": "image/png" } ] };
+            const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+            document.querySelector('#manifest').setAttribute('href', URL.createObjectURL(manifestBlob));
+        }
+
+    </script>
+</body>
+</html>
+
